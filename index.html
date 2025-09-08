@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Usage Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status.tracking {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status.stopped {
+            background: #f44336;
+            color: white;
+        }
+
+        .filter-tabs {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-tab {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            background: transparent;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-header h2 {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .total-time {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .app-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .app-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .app-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .app-sessions {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .app-stats {
+            text-align: right;
+        }
+
+        .app-time {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .app-percentage {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .no-data i {
+            font-size: 3em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .app-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .app-stats {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>App Usage Tracker</h1>
+            <p>Monitor your application usage time on macOS</p>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">Start Tracking</button>
+            <button id="stopBtn" class="btn btn-secondary">Stop Tracking</button>
+            <div id="status" class="status stopped">Stopped</div>
+            <button id="refreshBtn" class="btn btn-outline">Refresh</button>
+            <button id="clearBtn" class="btn btn-outline">Clear Data</button>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-period="today">Today</button>
+            <button class="filter-tab" data-period="yesterday">Yesterday</button>
+            <button class="filter-tab" data-period="week">This Week</button>
+            <button class="filter-tab" data-period="all">All Time</button>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-header">
+                <h2 id="statsTitle">Today's Usage</h2>
+                <div class="total-time" id="totalTime">Total: 0h 0m 0s</div>
+            </div>
+            <div id="appList" class="app-list">
+                <div class="no-data">
+                    <div>📱</div>
+                    <p>No usage data available.<br>Start tracking to see your app usage!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AppUsageTracker {
+            constructor() {
+                this.currentPeriod = 'today';
+                this.isTracking = false;
+                this.init();
+            }
+
+            async init() {
+                this.bindEvents();
+                await this.updateTrackingStatus();
+                await this.loadUsageStats();
+                this.setupAutoRefresh();
+            }
+
+            bindEvents() {
+                // Control buttons
+                document.getElementById('startBtn').addEventListener('click', () => this.startTracking());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopTracking());
+                document.getElementById('refreshBtn').addEventListener('click', () => this.loadUsageStats());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearData());
+
+                // Filter tabs
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => this.changePeriod(e.target.dataset.period));
+                });
+
+                // Listen for usage updates from main process
+                window.electronAPI.onUsageUpdated(() => {
+                    this.loadUsageStats();
+                });
+            }
+
+            async updateTrackingStatus() {
+                try {
+                    this.isTracking = await window.electronAPI.isTracking();
+                    const statusEl = document.getElementById('status');
+                    
+                    if (this.isTracking) {
+                        statusEl.textContent = 'Tracking';
+                        statusEl.className = 'status tracking';
+                    } else {
+                        statusEl.textContent = 'Stopped';
+                        statusEl.className = 'status stopped';
+                    }
+                } catch (error) {
+                    console.error('Error updating tracking status:', error);
+                }
+            }
+
+            async startTracking() {
+                try {
+                    await window.electronAPI.startTracking();
+                    await this.updateTrackingStatus();
+                    this.showNotification('Tracking started!', 'success');
+                } catch (error) {
+                    console.error('Error starting tracking:', error);
+                    this.showNotification('Failed to start tracking', 'error');
+                }
+            }
+
+            async stopTracking() {
+                try {
+                    await window.electronAPI.stopTracking();
+                    await this.updateTrackingStatus();
+                    await this.loadUsageStats(); // Refresh to show final data
+                    this.showNotification('Tracking stopped!', 'success');
+                } catch (error) {
+                    console.error('Error stopping tracking:', error);
+                    this.showNotification('Failed to stop tracking', 'error');
+                }
+            }
+
+            async loadUsageStats() {
+                try {
+                    const stats = await window.electronAPI.getUsageStats(this.currentPeriod);
+                    this.renderStats(stats);
+                } catch (error) {
+                    console.error('Error loading usage stats:', error);
+                    this.showNotification('Failed to load usage stats', 'error');
+                }
+            }
+
+            renderStats(stats) {
+                const titleEl = document.getElementById('statsTitle');
+                const totalTimeEl = document.getElementById('totalTime');
+                const appListEl = document.getElementById('appList');
+
+                // Update title
+                const periodTitles = {
+                    'today': "Today's Usage",
+                    'yesterday': "Yesterday's Usage",
+                    'week': "This Week's Usage",
+                    'all': "All Time Usage"
+                };
+                titleEl.textContent = periodTitles[stats.period] || "Usage Stats";
+
+                // Update total time
+                totalTimeEl.textContent = `Total: ${stats.totalTime}`;
+
+                // Render app list
+                if (stats.apps.length === 0) {
+                    appListEl.innerHTML = `
+                        <div class="no-data">
+                            <div>📱</div>
+                            <p>No usage data for this period.<br>Start tracking to see your app usage!</p>
+                        </div>
+                    `;
+                } else {
+                    appListEl.innerHTML = stats.apps.map(app => `
+                        <div class="app-item">
+                            <div class="app-info">
+                                <div class="app-name">${this.escapeHtml(app.appName)}</div>
+                                <div class="app-sessions">${app.sessionCount} session${app.sessionCount !== 1 ? 's' : ''}</div>
+                            </div>
+                            <div class="app-stats">
+                                <div class="app-time">${app.totalTime}</div>
+                                <div class="app-percentage">${app.percentage}%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${app.percentage}%"></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            changePeriod(period) {
+                this.currentPeriod = period;
+                
+                // Update active tab
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-period="${period}"]`).classList.add('active');
+                
+                this.loadUsageStats();
+            }
+
+            async clearData() {
+                if (confirm('Are you sure you want to clear all usage data? This action cannot be undone.')) {
+                    try {
+                        await window.electronAPI.clearData();
+                        await this.loadUsageStats();
+                        this.showNotification('All data cleared successfully!', 'success');
+                    } catch (error) {
+                        console.error('Error clearing data:', error);
+                        this.showNotification('Failed to clear data', 'error');
+                    }
+                }
+            }
+
+            setupAutoRefresh() {
+                // Auto-refresh every 30 seconds if tracking is enabled
+                setInterval(async () => {
+                    if (this.isTracking) {
+                        await this.loadUsageStats();
+                    }
+                }, 30000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showNotification(message, type = 'info') {
+                // Simple notification system
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                `;
+                
+                notification.style.background = type === 'success' ? '#4CAF50' : 
+                                              type === 'error' ? '#f44336' : '#2196F3';
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 3000);
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AppUsageTracker();
+        });
+    </script>
+</body>
+</html>
