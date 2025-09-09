@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const runAppleScript = require('run-applescript');
+const applescript = require('applescript');
 const Database = require('./database');
 
 class AppUsageTracker {
@@ -37,8 +37,8 @@ class AppUsageTracker {
     }
   }
 
-  async getCurrentApp() {
-    try {
+  getCurrentApp() {
+    return new Promise((resolve, reject) => {
       const script = `
         tell application "System Events"
           set frontApp to name of first application process whose frontmost is true
@@ -46,11 +46,14 @@ class AppUsageTracker {
         end tell
       `;
 
-      const result = await runAppleScript(script);
-      return result.trim();
-    } catch (error) {
-      throw error;
-    }
+      applescript.execString(script, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
   }
 
   async trackCurrentApp() {
