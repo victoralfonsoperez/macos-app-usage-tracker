@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const applescript = require('applescript');
+const { exec } = require('child_process');
 const Database = require('./database');
 
 class AppUsageTracker {
@@ -46,11 +46,14 @@ class AppUsageTracker {
         end tell
       `;
 
-      applescript.execString(script, (err, result) => {
-        if (err) {
-          reject(err);
+      // Use osascript command directly instead of external package
+      exec(`osascript -e '${script}'`, (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+        } else if (stderr) {
+          reject(new Error(stderr));
         } else {
-          resolve(result);
+          resolve(stdout.trim());
         }
       });
     });
