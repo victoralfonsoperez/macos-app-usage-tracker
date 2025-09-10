@@ -4,23 +4,36 @@
   "description": "Track application usage time on macOS",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "node docker-start.js",
+    "start:electron": "electron .",
+    "start:headless": "node docker-start.js",
+    "start:docker": "node docker-start.js",
     "dev": "electron . --dev",
     "build": "electron-builder",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "docker:build": "docker build -t macos-app-usage-tracker .",
+    "docker:run": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:health": "curl -s http://localhost:3000/health | jq '.'",
+    "test": "node test-docker.js",
+    "setup": "./setup-docker.sh"
   },
-  "keywords": ["electron", "macos", "screen-time", "usage-tracker"],
-  "author": "Your Name",
+  "keywords": ["electron", "macos", "screen-time", "usage-tracker", "docker"],
+  "author": "Victor Alfonso Perez",
   "license": "MIT",
   "devDependencies": {
     "electron": "^27.0.0",
     "electron-builder": "^24.6.4"
   },
   "dependencies": {
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0"
   },
   "build": {
-    "appId": "com.yourname.app-usage-tracker",
+    "appId": "com.victoralfonsoperez.app-usage-tracker",
     "productName": "App Usage Tracker",
     "directories": {
       "output": "dist"
@@ -48,5 +61,9 @@
         }
       ]
     }
+  },
+  "engines": {
+    "node": "18.20.4",
+    "npm": ">=8.0.0"
   }
 }
