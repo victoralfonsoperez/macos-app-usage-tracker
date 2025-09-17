@@ -7,7 +7,12 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "electron-builder",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "docker:build": "docker build -t macos-app-usage-tracker .",
+    "docker:run": "docker run -p 3000:3000 -v $(pwd)/data:/app/data macos-app-usage-tracker",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
   "keywords": ["electron", "macos", "screen-time", "usage-tracker"],
   "author": "Your Name",

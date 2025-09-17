@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app-usage-tracker:
+    build: .
+    container_name: macos-app-usage-tracker
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount database directory for persistence
+      - ./data:/app/data
+      # Mount logs directory
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - DATABASE_PATH=/app/data/usage_tracking.db
+    restart: unless-stopped
+
+    # Note: This service is configured for future web-based functionality
+    # The current Electron app requires macOS and X11/display server
+    # Consider adding environment variables for headless operation
+
+  # Optional: Add a database service if you want to use PostgreSQL instead of SQLite
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: usage-tracker-db
+  #   environment:
+  #     POSTGRES_DB: usage_tracker
+  #     POSTGRES_USER: tracker
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-defaultpassword}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   postgres_data:
